@@ -1,29 +1,47 @@
 pipeline {
     agent any
-    
+
+    environment {
+        // Define any environment variables you may need
+        MAVEN_HOME = tool 'Maven'
+        // You can set other environment variables as needed
+    }
+
     stages {
-        stage('Checkout') {
-            steps {
-                // Checkout the code from a version control system
-                // For example, from a Git repository:
-                git 'https://github.com/narasimhareddynaredla/sourcecode_java.git'
-            }
-        }
 
         stage('Build') {
             steps {
-                // Build the application using Maven
-                sh 'mvn clean package'
+                // Build the Maven project
+                script {
+                    def mavenHome = tool 'Maven'
+                    def mavenCmd = "${mavenHome}/bin/mvn"
+                    sh "${mavenCmd} clean install"
+                }
             }
         }
 
         stage('Test') {
             steps {
-                // Run unit and integration tests
-                sh 'mvn test'
+                // Run tests if needed
+                script {
+                    def mavenHome = tool 'Maven'
+                    def mavenCmd = "${mavenHome}/bin/mvn"
+                    sh "${mavenCmd} test"
+                }
             }
         }
 
-        
+    }
+
+    post {
+        success {
+            // Actions to be taken if the pipeline is successful
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            // Actions to be taken if the pipeline fails
+            echo 'Build or deployment failed!'
+        }
     }
 }
+
